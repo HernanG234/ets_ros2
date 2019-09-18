@@ -13,3 +13,13 @@ float64 heading
 float64 pitch
 float64 roll
 bool parking_brake
+float64 air_pressure
+float64 wear_engine
+float64 wear_transmission
+float64 battery_voltage
+float64 wear_wheels
+float64 cruise_control
+float64 fuel
+float64 fuel_average_consumption
+float64 wear_chassis
+float64 cargo_mass

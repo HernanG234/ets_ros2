@@ -77,6 +77,16 @@ struct telemetry_state_t
 	bool			trailer_connected;
 	scs_value_dplacement_t	placement;
 	bool			parking_brake;
+	float			air_pressure;
+	float			wear_engine;
+	float			wear_transmission;
+	float			battery_voltage;
+	float			wear_wheels;
+	float			cruise_control;
+	float			fuel;
+	float			fuel_average_consumption;
+	float			wear_chassis;
+	float			cargo_mass;
 
 } telemetry;
 
@@ -191,7 +201,7 @@ SCSAPI_VOID telemetry_frame_end(const scs_event_t UNUSED(event), const void *con
 		log_print(";---;---;---");
 	}
 	log_line(
-		";%f;%f;%f;%f;%f;%d;%d;%d;%f;%f;%f;%f;%f;%f;%f",
+		";%f;%f;%f;%f;%f;%d;%d;%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f",
 		telemetry.speed,
 		telemetry.acc.x,
 		telemetry.acc.y,
@@ -206,7 +216,17 @@ SCSAPI_VOID telemetry_frame_end(const scs_event_t UNUSED(event), const void *con
 		telemetry.placement.orientation.heading,
 		telemetry.placement.orientation.pitch,
 		telemetry.placement.orientation.roll,
-		telemetry.parking_brake
+		telemetry.parking_brake,
+		telemetry.air_pressure,
+		telemetry.wear_engine,
+		telemetry.wear_transmission,
+		telemetry.battery_voltage,
+		telemetry.wear_wheels,
+		telemetry.cruise_control,
+		telemetry.fuel,
+		telemetry.fuel_average_consumption,
+		telemetry.wear_chassis,
+		telemetry.cargo_mass
 	);
 
 	log_line("about to publish");
@@ -216,7 +236,10 @@ SCSAPI_VOID telemetry_frame_end(const scs_event_t UNUSED(event), const void *con
 				telemetry.placement.position.x, telemetry.placement.position.y,
 				telemetry.placement.position.z, telemetry.placement.orientation.heading*360.0f,
 				telemetry.placement.orientation.pitch*360.0f, telemetry.placement.orientation.roll*360.0f,
-				telemetry.parking_brake);
+				telemetry.parking_brake, telemetry.air_pressure, telemetry.wear_engine,
+				telemetry.wear_transmission, telemetry.battery_voltage, telemetry.wear_wheels,
+				telemetry.cruise_control, telemetry.fuel, telemetry.fuel_average_consumption,
+				telemetry.wear_chassis, telemetry.cargo_mass);
 	log_line("about to spin");
 	rclcpp::spin_some(publisher);
 	log_line("spinned");
@@ -529,7 +552,19 @@ SCSAPI_RESULT scs_telemetry_init(const scs_u32_t version, const scs_telemetry_in
 	version_params->register_for_channel(SCS_TELEMETRY_TRAILER_CHANNEL_connected, SCS_U32_NIL, SCS_VALUE_TYPE_bool, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_bool, &telemetry.trailer_connected);
 	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_world_placement, SCS_U32_NIL, SCS_VALUE_TYPE_dplacement, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_dplacement, &telemetry.placement);
 	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_parking_brake, SCS_U32_NIL, SCS_VALUE_TYPE_bool, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_bool, &telemetry.parking_brake);
+	
+	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_brake_air_pressure, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.air_pressure);
+	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_wear_engine, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.wear_engine);
+	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_wear_transmission, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.wear_transmission);
+	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_battery_voltage, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.battery_voltage);
+	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_wear_wheels, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.wear_wheels);
+	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_cruise_control, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.cruise_control);
+	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_fuel, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.fuel);
+	version_params->register_for_channel(SCS_TELEMETRY_TRUCK_CHANNEL_fuel_average_consumption, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.fuel_average_consumption);
+	version_params->register_for_channel(SCS_TELEMETRY_TRAILER_CHANNEL_wear_chassis, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.wear_chassis);
+	version_params->register_for_channel(SCS_TELEMETRY_CONFIG_ATTRIBUTE_cargo_mass, SCS_U32_NIL, SCS_VALUE_TYPE_float, SCS_TELEMETRY_CHANNEL_FLAG_none, telemetry_store_float, &telemetry.cargo_mass);
 	// Remember the function we will use for logging.
+
 
 	game_log = version_params->common.log;
 	game_log(SCS_LOG_TYPE_message, "Initializing telemetry log example");
