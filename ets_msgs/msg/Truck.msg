@@ -23,3 +23,5 @@ float64 fuel
 float64 fuel_average_consumption
 float64 wear_chassis
 float64 cargo_mass
+float64 latitude
+float64 longitude

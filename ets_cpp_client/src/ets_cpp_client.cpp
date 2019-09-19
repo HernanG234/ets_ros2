@@ -13,7 +13,8 @@ void callback(const ets_msgs::msg::Truck::SharedPtr msg)
   " wear_transmission=" << msg->wear_transmission << " battery_voltage=" << msg->battery_voltage <<
   " wear_wheels=" << msg->wear_wheels << " cruise_control=" << msg->cruise_control <<
   " fuel=" << msg->fuel << " fuel_average_consumption=" << msg->fuel_average_consumption <<
-  " wear_chassis=" << msg->wear_chassis << " cargo_mass=" << msg->cargo_mass << std::endl << std::endl;
+  " wear_chassis=" << msg->wear_chassis << " cargo_mass=" << msg->cargo_mass << std::endl << std::endl <<
+  "latitude= " << msg->latitude << " longitude= " << msg->longitude << std::endl;
 }
 
 int main(int argc, char * argv[])
